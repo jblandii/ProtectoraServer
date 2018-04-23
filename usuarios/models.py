@@ -8,6 +8,8 @@ from django.db.models.signals import post_save
 
 import os
 
+from protectora.models import Provincia
+
 PROJECT_PATH = os.path.dirname("__file__")
 
 
@@ -22,7 +24,7 @@ User.__unicode__ = user_new_unicode
 class DatosExtraUser(models.Model):
     user = models.OneToOneField(User)
     direccion = models.CharField(max_length=100)
-    provincia = models.CharField(max_length=20)
+    provincia = models.ForeignKey(Provincia)
     cod_postal = models.CharField(max_length=5)
     telefono = models.CharField(max_length=9)
 

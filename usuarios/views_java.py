@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from utilidades.contrasena import contrasena_generator
+
 __author__ = 'brian'
 
 import django.contrib.auth as auth
@@ -8,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 import json
 import datetime
-from utilidades import Token
+from utilidades import Token, enviarmail
 from usuarios.models import Tokenregister
 from django.contrib.auth.models import User
 
@@ -124,6 +126,40 @@ def logout(request):
 
     except Exception as e:
         response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def recuperar_contrasena(request):
+    try:
+        try:
+            # import pdb
+            # pdb.set_trace()
+            datos = json.loads(request.POST['data'])
+            username = datos.get('usuario')
+
+        except Exception as e:
+            username = request.POST['usuario']
+
+        # if token != "" and comprobar_usuario2(token, userdjango_id):
+        userdjango = get_object_or_None(User, username=username)
+        if userdjango is not None:
+            nueva_contrasena = contrasena_generator()
+            print nueva_contrasena
+            userdjango.set_password(nueva_contrasena)
+
+            userdjango.save()
+            # enviarmail.envmail2("Se ha generado una nueva contraseña: " + nueva_contrasena, "Contraseña nueva", userdjango.email)
+            response_data = {'result': 'ok', 'message': 'se ha enviado un email con la nueva contraseña'}
+        else:
+            response_data = {'result': 'error', 'message': 'usuario no existente'}
+        # else:
+        #     response_data = {'result': 'error', 'message': 'formulario no rellenado'}
+
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0003', 'result': 'error', 'message': str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 

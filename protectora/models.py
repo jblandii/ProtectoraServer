@@ -4,15 +4,30 @@ from django.db import models
 
 
 # Create your models here.
+class ComunidadAutonoma(models.Model):
+    comunidad_autonoma = models.CharField(max_length=25)
+
+    def __unicode__(self):
+        return self.comunidad_autonoma
+
+
+# Create your models here.
+class Provincia(models.Model):
+    comunidad_autonoma = models.ForeignKey(ComunidadAutonoma)
+    provincia = models.CharField(max_length=25)
+
+    def __unicode__(self):
+        return self.provincia
+
+# Create your models here.
 class Protectora(models.Model):
     nombre = models.CharField(max_length=50)
     direccion = models.CharField(max_length=50)
+    provincia = models.ForeignKey(Provincia)
     cod_postal = models.CharField(max_length=50)
-    provincia = models.CharField(max_length=50)
 
     def __unicode__(self):
         return self.nombre
-
 
 class RedSocial(models.Model):
     protectora = models.ForeignKey(Protectora)
@@ -64,9 +79,9 @@ class Adopcion(models.Model):
         return self.fecha
 
 
-class Foto (models.Model):
+class Foto(models.Model):
     animal = models.ForeignKey(Animal)
     foto = models.ImageField()
 
     def __unicode__(self):
-        return str (self.animal.pk)
+        return str(self.animal.pk)

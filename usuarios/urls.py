@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from usuarios import views
 
 urlpatterns = [
-
      url(r'^administradores/$', login_required(views.AdministradoresList.as_view()), name='administradores_list'),
      url(r'^clientes/$', login_required(views.ClientesList.as_view()), name='clientes_list'),
      url(r'^autocompletado/$', login_required(views.UsuarioAutocomplete.as_view()), name='usuario_autocomplete'),
