@@ -2,24 +2,10 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
 # Create your models here.
-class ComunidadAutonoma(models.Model):
-    comunidad_autonoma = models.CharField(max_length=25)
-
-    def __unicode__(self):
-        return self.comunidad_autonoma
+from comunidad.models import Provincia
 
 
-# Create your models here.
-class Provincia(models.Model):
-    comunidad_autonoma = models.ForeignKey(ComunidadAutonoma)
-    provincia = models.CharField(max_length=25)
-
-    def __unicode__(self):
-        return self.provincia
-
-# Create your models here.
 class Protectora(models.Model):
     nombre = models.CharField(max_length=50)
     direccion = models.CharField(max_length=50)

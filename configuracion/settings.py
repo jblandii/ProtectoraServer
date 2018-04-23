@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'usuarios',
     'web',
     'protectora',
+    'comunidad',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 
 import os
 
-from protectora.models import Provincia
+from comunidad.models import Provincia
 
 PROJECT_PATH = os.path.dirname("__file__")
 
