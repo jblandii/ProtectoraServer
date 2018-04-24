@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^comprobar_token/$', usuarios_java_views.comprobar_token),
     url(r'^cambiar_pass/$', usuarios_java_views.cambiar_pass),
     url(r'^recuperar_contrasena/$', usuarios_java_views.recuperar_contrasena),
+    url(r'^registrar_usuario/$', usuarios_java_views.registrar_usuario),
 ]

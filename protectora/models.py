@@ -8,12 +8,14 @@ from comunidad.models import Provincia
 
 class Protectora(models.Model):
     nombre = models.CharField(max_length=50)
+    admin = models.ForeignKey(User)
     direccion = models.CharField(max_length=50)
     provincia = models.ForeignKey(Provincia)
     cod_postal = models.CharField(max_length=50)
 
     def __unicode__(self):
         return self.nombre
+
 
 class RedSocial(models.Model):
     protectora = models.ForeignKey(Protectora)
@@ -54,6 +56,14 @@ class Animal(models.Model):
 
     def __unicode__(self):
         return self.raza
+
+
+class MeGusta(models.Model):
+    animal = models.ForeignKey(Animal)
+    usuario = models.ForeignKey(User)
+
+    def __unicode__(self):
+        return self.usuario
 
 
 class Adopcion(models.Model):

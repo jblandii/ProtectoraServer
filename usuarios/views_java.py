@@ -237,6 +237,53 @@ def cambiar_pass(request):
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
+# definicion para registrar un usuario
+@csrf_exempt
+def registrar_usuario(request):
+    print "registrando usuario"
+    try:
+        datos = json.loads(request.POST['data'])
+        nombre = datos.get('usuario')
+        email = datos.get('email')
+        password = datos.get('password')
+
+        if (nombre is None and email is None and password is None) or (nombre == "" and password == "" and email == ""):
+            response_data = {'result': 'error', 'message': 'Falta el nombre usuario, email y password'}
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+        if nombre is None or nombre == "":
+            response_data = {'result': 'error', 'message': 'Falta el nombre de usuario'}
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+        if password is None or password == "":
+            response_data = {'result': 'error', 'message': 'Falta el password'}
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+        if email is None or email == "":
+            response_data = {'result': 'error', 'message': 'Falta el email'}
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+        usuarios = User.objects.filter(username=nombre)
+        usuarios_email = User.objects.filter(email=email)
+
+        if usuarios.count() == 0:
+            if usuarios_email.count() == 0:
+                user = User.objects.create(username=nombre, email=email)
+                user.set_password(password)
+                user.save()
+                response_data = {'result': 'ok', 'message': 'Usuario creado correctamente'}
+            else:
+                response_data = {'result': 'error', 'message': 'Este email ya existe'}
+        else:
+            response_data = {'result': 'error', 'message': 'Este nombre de usuario ya existe'}
+
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except:
+        response_data = {'errorcode': 'U0005', 'result': 'error', 'message': 'Error en crear usuario. ' + str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
 @csrf_exempt
 def cambiar_datos(request):
     print "cambiando pass"
