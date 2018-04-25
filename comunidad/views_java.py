@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 import comunidad
-from comunidad.models import ComunidadAutonoma
+from comunidad.models import ComunidadAutonoma, Provincia
 
 __author__ = 'brian'
 
@@ -46,20 +46,20 @@ def comunidades(request):
 
 @csrf_exempt
 def provincias(request):
-    print "Comunidades"
+    print "Provincias"
     try:
         datos = json.loads(request.POST['data'])
         token = datos.get('tokenFingido')
+        id_comunidad = datos.get('id_comunidad')
         comunidad = datos.get('comunidad_autonoma')
 
-        comunidad_autonoma = ComunidadAutonoma.objects.filter(comunidad_autonoma=comunidad)
-        if comunidad_autonoma is not None:
+        provincias = Provincia.objects.filter(comunidad_autonoma=id_comunidad).order_by("provincia")
+        if provincias is not None:
 
             if token == "JAMAGELEjamagele":
-                comunidades = ComunidadAutonoma.objects.order_by("comunidad_autonoma")
 
                 lista_provincias = []
-                for provincia in comunidades:
+                for provincia in provincias:
                     lista_provincias.append({"pk": provincia.pk,
                                              "provincia": provincia.provincia})
 
