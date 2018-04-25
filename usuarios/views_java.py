@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.core.mail import send_mail
 
+from comunidad.models import Provincia
 from configuracion import settings
 from utilidades.contrasena import contrasena_generator
 
@@ -14,7 +15,7 @@ from django.shortcuts import get_object_or_404
 import json
 import datetime
 from utilidades import Token, enviarmail
-from usuarios.models import Tokenregister
+from usuarios.models import Tokenregister, DatosExtraUser
 from django.contrib.auth.models import User
 
 
@@ -153,13 +154,13 @@ def recuperar_contrasena(request):
             userdjango.save()
             enviarmail.enviar_email("Contraseña nueva", "Se ha generado una nueva contraseña: " + nueva_contrasena,
                                     "Se ha generado una nueva contraseña: " + nueva_contrasena, [userdjango.email, ])
-            response_data = {'result': 'ok', 'message': 'se ha enviado un email con la nueva contraseña'}
+            response_data = {'result': 'ok', 'message': 'usuario existente'}
         else:
             response_data = {'result': 'error', 'message': 'usuario no existente'}
-        # else:
-        #     response_data = {'result': 'error', 'message': 'formulario no rellenado'}
 
+        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
     except Exception as e:
         response_data = {'errorcode': 'U0003', 'result': 'error', 'message': str(e)}
@@ -249,6 +250,11 @@ def registrar_usuario(request):
         nombre = datos.get('usuario')
         email = datos.get('email')
         password = datos.get('password')
+        provincia = datos.get('provincia')
+        # Hago un filtro con el nombre de la provincia obtenida para obtener el objeto con la id.
+        provincia_escogida = get_object_or_None(Provincia, provincia=provincia)
+        id_provincia = provincia_escogida.pk
+        print id_provincia
 
         if (nombre is None and email is None and password is None) or (nombre == "" and password == "" and email == ""):
             response_data = {'result': 'error', 'message': 'Falta el nombre usuario, email y password'}
@@ -273,7 +279,12 @@ def registrar_usuario(request):
             if usuarios_email.count() == 0:
                 user = User.objects.create(username=nombre, email=email)
                 user.set_password(password)
+                usuario = DatosExtraUser.objects.create(user=user, direccion="", provincia=provincia_escogida,
+                                                        cod_postal="", telefono="")
+                # usuario = DatosExtraUser.objects.create(user=user.pk, provincia=provincia_escogida)
+                # user.datosextrauser.getProvincia(provincia_escogida)
                 user.save()
+                usuario.save()
                 response_data = {'result': 'ok', 'message': 'Usuario creado correctamente'}
             else:
                 response_data = {'result': 'error', 'message': 'Este email ya existe'}
@@ -282,7 +293,7 @@ def registrar_usuario(request):
 
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
-    except:
+    except Exception as e:
         response_data = {'errorcode': 'U0005', 'result': 'error', 'message': 'Error en crear usuario. ' + str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 

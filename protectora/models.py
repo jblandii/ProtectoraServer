@@ -30,6 +30,9 @@ class RedSocial(models.Model):
 
 
 class Animal(models.Model):
+    ANIMALES = (('Perro', 'Perro'),
+                ('Gato', 'Gato'))
+    mascota = models.CharField(max_length=10, choices=ANIMALES)
     raza = models.CharField(max_length=30)
     color = models.CharField(max_length=50)
     edad = models.IntegerField(default=0)
