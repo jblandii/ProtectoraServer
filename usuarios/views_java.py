@@ -1,4 +1,7 @@
 # -*- encoding: utf-8 -*-
+from django.core.mail import send_mail
+
+from configuracion import settings
 from utilidades.contrasena import contrasena_generator
 
 __author__ = 'brian'
@@ -145,11 +148,11 @@ def recuperar_contrasena(request):
         userdjango = get_object_or_None(User, username=username)
         if userdjango is not None:
             nueva_contrasena = contrasena_generator()
-            print nueva_contrasena
+            print nueva_contrasena + " - " + userdjango.email
             userdjango.set_password(nueva_contrasena)
-
             userdjango.save()
-            # enviarmail.envmail2("Se ha generado una nueva contraseña: " + nueva_contrasena, "Contraseña nueva", userdjango.email)
+            enviarmail.enviar_email("Contraseña nueva", "Se ha generado una nueva contraseña: " + nueva_contrasena,
+                                    "Se ha generado una nueva contraseña: " + nueva_contrasena, [userdjango.email, ])
             response_data = {'result': 'ok', 'message': 'se ha enviado un email con la nueva contraseña'}
         else:
             response_data = {'result': 'error', 'message': 'usuario no existente'}

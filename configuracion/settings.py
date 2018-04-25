@@ -182,6 +182,17 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+# CONFIGURACIÓN DE CORREO
+DEFAULT_FROM_EMAIL = 'Protectora <protectora.jmgl@gmail.com>'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'protectora.jmgl@gmail.com'
+EMAIL_HOST_PASSWORD = 'JaMaGeLe'
+EMAIL_PORT = 587
+
+
+
 ROOT_URLCONF = 'configuracion.urls'
 
 WSGI_APPLICATION = 'configuracion.wsgi.application'
