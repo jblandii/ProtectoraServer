@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 import protectora
 from comunidad.models import Provincia
-from protectora.models import Animal
+from protectora.models import Animal, Protectora
 from usuarios.models import Tokenregister
 
 __author__ = 'brian'
@@ -23,6 +23,7 @@ def cargar_animales(request):
         try:
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
+            print token
             animales = Animal.objects.all()
             try:
                 mascota = datos.get('mascota')
@@ -120,9 +121,13 @@ def cargar_animales(request):
                                        "animal": animal.raza,
                                        "imagenes": fotos})
 
-            response_data = {'result': 'ok',
-                             'message': 'listado de animales',
-                             "lista_animales": lista_animales}
+            if len(lista_animales) == 0:
+                response_data = {'result': 'ok_sin_animales',
+                                 'message': 'no hay animales con dichos filtros'}
+            else:
+                response_data = {'result': 'ok',
+                                 'message': 'listado de animales',
+                                 "lista_animales": lista_animales}
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
@@ -143,6 +148,68 @@ def cargar_animales(request):
 
         # user = get_object_or_None(Tokenregister, token=token)
         # usu = user.user.datosextrauser.provincia
+        print response_data
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def cargar_protectoras(request):
+    print "carga de protectoras"
+    try:
+        datos = json.loads(request.POST['data'])
+
+        try:
+            token = datos.get('token')
+            usuario_id = datos.get('usuario_id')
+            print token
+            protectoras = Protectora.objects.all()
+            try:
+                provincia = datos.get('provincia')
+
+                # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
+                objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
+
+                animales = protectoras.filter(provincia=objeto_provincia)
+            except:
+                pass
+
+            lista_protectoras = []
+            for protectora in protectoras:
+                lista_protectoras.append({"pk": protectora.pk,
+                                          "animal": protectora.provincia})
+
+            if len(lista_protectoras) == 0:
+                response_data = {'result': 'ok_sin_protectoras',
+                                 'message': 'no hay protectoras con dichos filtros'}
+            else:
+                response_data = {'result': 'ok',
+                                 'message': 'listado de animales',
+                                 "lista_protectoras": lista_protectoras}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+
+        # if token is not None:
+        #
+        #     # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
+        #     objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
+        #
+        #     animales = Animal.objects.filter(protectora__provincia=objeto_provincia)
+        #
+        #     print animales.count()
+        #
+        #     lista_animales = []
+        #
+        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
+        # else:
+        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
+
+        # user = get_object_or_None(Tokenregister, token=token)
+        # usu = user.user.datosextrauser.provincia
+        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     except Exception as e:
