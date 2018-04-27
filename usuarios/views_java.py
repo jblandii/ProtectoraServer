@@ -247,6 +247,7 @@ def registrar_usuario(request):
     print "registrando usuario"
     try:
         datos = json.loads(request.POST['data'])
+
         nombre = datos.get('usuario')
         email = datos.get('email')
         password = datos.get('password')

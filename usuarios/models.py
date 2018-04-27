@@ -27,6 +27,7 @@ class DatosExtraUser(models.Model):
     provincia = models.ForeignKey(Provincia)
     cod_postal = models.CharField(max_length=5)
     telefono = models.CharField(max_length=9)
+    imagen = models.ImageField(default="imagenes/perfiles/usuario.png", upload_to="imagenes/perfiles")
 
     def __unicode__(self):
         return u"%s" % self.user.username

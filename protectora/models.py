@@ -34,7 +34,11 @@ class Animal(models.Model):
                 ('Gato', 'Gato'))
     mascota = models.CharField(max_length=10, choices=ANIMALES)
     raza = models.CharField(max_length=30)
-    color = models.CharField(max_length=50)
+    COLORES = (('Blanco', 'Blanco'),
+               ('Negro', 'Negro'),
+               ('Gris', 'Gris'),
+               ('Marron', 'Marrón'))
+    color = models.CharField(max_length=50, choices=COLORES)
     edad = models.IntegerField(default=0)
     PELAJES = (('Corto', 'Corto'),
                ('Largo', 'Largo'))
@@ -42,7 +46,7 @@ class Animal(models.Model):
     SEXO = (('Macho', 'Macho'),
             ('Hembra', 'Hembra'))
     sexo = models.CharField(max_length=10, choices=SEXO)
-    ESTADOS = (('Adopción', 'Adopción'),
+    ESTADOS = (('Adopcion', 'Adopción'),
                ('Acogida', 'Acogida'))
     estado = models.CharField(max_length=15, choices=ESTADOS)
     TAMANIOS = (('Pequeño', 'Pequeño'),
@@ -52,9 +56,10 @@ class Animal(models.Model):
     peso = models.FloatField(default=0)
     enfermedad = models.CharField(max_length=255)
     vacuna = models.CharField(max_length=50)
-    SINO = (('Sí', 'Sí'),
+    SINO = (('Si', 'Sí'),
             ('No', 'No'))
     chip = models.CharField(max_length=2, choices=SINO)
+    fecha = models.DateField(auto_now_add=True)
     protectora = models.ForeignKey(Protectora)
 
     def __unicode__(self):
@@ -72,15 +77,15 @@ class MeGusta(models.Model):
 class Adopcion(models.Model):
     animal = models.ForeignKey(Animal)
     usuario = models.ForeignKey(User)
-    fecha = models.DateField()
+    fecha = models.DateField(auto_now_add=True)
 
     def __unicode__(self):
         return self.fecha
 
 
-class Foto(models.Model):
+class ImagenAnimal(models.Model):
     animal = models.ForeignKey(Animal)
-    foto = models.ImageField()
+    imagen = models.ImageField(upload_to="imagenes/animales")
 
     def __unicode__(self):
         return str(self.animal.pk)
