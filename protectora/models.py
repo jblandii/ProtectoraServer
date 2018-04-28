@@ -49,7 +49,7 @@ class Animal(models.Model):
     ESTADOS = (('Adopcion', 'Adopción'),
                ('Acogida', 'Acogida'))
     estado = models.CharField(max_length=15, choices=ESTADOS)
-    TAMANIOS = (('Pequeño', 'Pequeño'),
+    TAMANIOS = (('Pequeno', 'Pequeño'),
                 ('Mediano', 'Mediano'),
                 ('Grande', 'Grande'))
     tamano = models.CharField(max_length=50, choices=TAMANIOS)
