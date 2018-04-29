@@ -17,15 +17,12 @@ import json
 @csrf_exempt
 def cargar_animales(request):
     print "carga de animales"
-    # import pdb
-    # pdb.set_trace()
     try:
         datos = json.loads(request.POST['data'])
 
         try:
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
-            print token
             animales = Animal.objects.all()
             # try:
             #     mascota = datos.get('mascota')
@@ -120,8 +117,21 @@ def cargar_animales(request):
                     fotos.append({"foto": str(foto.imagen)})
 
                 lista_animales.append({"pk": animal.pk,
-                                       "animal": animal.raza,
-                                       "imagenes": fotos})
+                                       "nombre": animal.nombre,
+                                       "raza": animal.raza.pk,
+                                       "mascota": animal.mascota,
+                                       "color": animal.color,
+                                       "edad": animal.edad,
+                                       "pelaje": animal.tipo_pelaje,
+                                       "sexo": animal.sexo,
+                                       "tamano": animal.tamano,
+                                       "peso": animal.peso,
+                                       "enfermedad": animal.enfermedad,
+                                       "vacuna": animal.vacuna,
+                                       "chip": animal.chip,
+                                       "estado": animal.estado,
+                                       "id_protectora": animal.protectora.pk})
+                # "imagenes": fotos})
 
             if len(lista_animales) == 0:
                 response_data = {'result': 'ok_sin_animales',

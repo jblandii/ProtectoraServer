@@ -17,6 +17,13 @@ class Protectora(models.Model):
         return self.nombre
 
 
+class RazaAnimal(models.Model):
+    nombre = models.CharField(max_length=30)
+
+    def __unicode__(self):
+        return self.nombre
+
+
 class RedSocial(models.Model):
     protectora = models.ForeignKey(Protectora)
     TIPOS = (('Facebook', 'Facebook'),
@@ -32,8 +39,9 @@ class RedSocial(models.Model):
 class Animal(models.Model):
     ANIMALES = (('Perro', 'Perro'),
                 ('Gato', 'Gato'))
+    nombre = models.CharField(max_length=15)
     mascota = models.CharField(max_length=10, choices=ANIMALES)
-    raza = models.CharField(max_length=30)
+    raza = models.ForeignKey(RazaAnimal)
     COLORES = (('Blanco', 'Blanco'),
                ('Negro', 'Negro'),
                ('Gris', 'Gris'),
@@ -63,7 +71,7 @@ class Animal(models.Model):
     protectora = models.ForeignKey(Protectora)
 
     def __unicode__(self):
-        return self.raza
+        return self.nombre
 
 
 class MeGusta(models.Model):
