@@ -1,8 +1,6 @@
 # -*- encoding: utf-8 -*-
-import protectora
 from comunidad.models import Provincia
 from protectora.models import Animal, Protectora
-from usuarios.models import Tokenregister
 
 __author__ = 'brian'
 
@@ -118,7 +116,7 @@ def cargar_animales(request):
 
                 lista_animales.append({"pk": animal.pk,
                                        "nombre": animal.nombre,
-                                       "raza": animal.raza.pk,
+                                       "raza": animal.raza.nombre,
                                        "mascota": animal.mascota,
                                        "color": animal.color,
                                        "edad": animal.edad,
@@ -177,51 +175,28 @@ def cargar_protectoras(request):
         try:
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
-            print token
             protectoras = Protectora.objects.all()
-            try:
-                provincia = datos.get('provincia')
-
-                # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
-                objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
-
-                animales = protectoras.filter(provincia=objeto_provincia)
-            except:
-                pass
 
             lista_protectoras = []
             for protectora in protectoras:
-                lista_protectoras.append({"pk": protectora.pk,
-                                          "animal": protectora.provincia})
+                lista_protectoras.append({
+                    "pk": protectora.pk,
+                    "nombre": protectora.nombre,
+                    "direccion": protectora.direccion,
+                    "codigo_postal": protectora.cod_postal,
+                    "provincia": protectora.provincia.provincia})
 
             if len(lista_protectoras) == 0:
                 response_data = {'result': 'ok_sin_protectoras',
-                                 'message': 'no hay protectoras con dichos filtros'}
+                                 'message': 'no hay animales con dichos filtros'}
             else:
                 response_data = {'result': 'ok',
-                                 'message': 'listado de animales',
+                                 'message': 'listado de protectoras',
                                  "lista_protectoras": lista_protectoras}
+            print response_data
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
-        # if token is not None:
-        #
-        #     # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
-        #     objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
-        #
-        #     animales = Animal.objects.filter(protectora__provincia=objeto_provincia)
-        #
-        #     print animales.count()
-        #
-        #     lista_animales = []
-        #
-        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
-        # else:
-        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
-
-        # user = get_object_or_None(Tokenregister, token=token)
-        # usu = user.user.datosextrauser.provincia
-        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     except Exception as e:

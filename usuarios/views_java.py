@@ -322,6 +322,46 @@ def cambiar_datos(request):
 
 
 @csrf_exempt
+def cargar_usuario(request):
+    print "Cargando usuario"
+    try:
+        datos = json.loads(request.POST['data'])
+
+        try:
+            token = datos.get('token')
+            usuario_id = datos.get('usuario_id')
+            userdjango = get_object_or_None(User, pk=usuario_id)
+
+            if userdjango is not None:
+                usuario = []
+                usuario.append({
+                    "username": userdjango.username,
+                    "nombre": userdjango.first_name,
+                    "apellidos": userdjango.last_name,
+                    "email": userdjango.email,
+                    "telefono": userdjango.datosextrauser.telefono
+                })
+                response_data = {
+                    'result': 'ok',
+                    'message': 'datos del usuario',
+                    'usuario': usuario
+                }
+            else:
+                response_data = {'result': 'error',
+                                 'message': 'ha habido un error, intentelo de nuevo'}
+
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+
+        print response_data
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0007', 'result': 'error', 'message': 'Error en perfil de usuario: ' + str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
 def get_usuarios(request):
     print "buscando usuarios"
     try:
