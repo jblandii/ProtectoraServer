@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from django.contrib.auth.models import User
+
 import comunidad
 from comunidad.models import ComunidadAutonoma, Provincia
 
@@ -17,20 +19,30 @@ def comunidades(request):
     print "Comunidades"
     try:
         datos = json.loads(request.POST['data'])
-        token = datos.get('tokenFingido')
+        tokenFingido = datos.get('tokenFingido')
+        usuario_id = datos.get('usuario_id')
 
-        if token == "JAMAGELEjamagele":
+        if tokenFingido == "JAMAGELEjamagele":
             comunidades = ComunidadAutonoma.objects.order_by("comunidad_autonoma")
             lista_comunidades = []
             for comunidad in comunidades:
                 lista_comunidades.append({"pk": comunidad.pk,
                                           "comunidad_autonoma": comunidad.comunidad_autonoma})
-
-            response_data = {
-                'result': 'ok',
-                'message': "listado comunidades",
-                'comunidades': lista_comunidades
-            }
+            if usuario_id is not None:
+                usuario = get_object_or_None(User, pk=usuario_id)
+                comunidad = usuario.datosextrauser.provincia.comunidad_autonoma.pk
+                response_data = {
+                    'result': 'ok',
+                    'message': "listado comunidades",
+                    'comunidades': lista_comunidades,
+                    'comunidad_usuario': comunidad
+                }
+            else:
+                response_data = {
+                    'result': 'ok',
+                    'message': "listado comunidades",
+                    'comunidades': lista_comunidades
+                }
             return http.HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             response_data = {
@@ -51,7 +63,7 @@ def provincias(request):
         datos = json.loads(request.POST['data'])
         token = datos.get('tokenFingido')
         id_comunidad = datos.get('id_comunidad')
-        comunidad = datos.get('comunidad_autonoma')
+        usuario_id = datos.get('usuario_id')
 
         provincias = Provincia.objects.filter(comunidad_autonoma=id_comunidad).order_by("provincia")
         if provincias is not None:
@@ -63,11 +75,21 @@ def provincias(request):
                     lista_provincias.append({"pk": provincia.pk,
                                              "provincia": provincia.provincia})
 
-                response_data = {
-                    'result': 'ok',
-                    'message': "listado provincias",
-                    'provincias': lista_provincias
-                }
+                if usuario_id is not None:
+                    usuario = get_object_or_None(User, pk=usuario_id)
+                    provincia = usuario.datosextrauser.provincia
+                    response_data = {
+                        'result': 'ok',
+                        'message': "listado provincias",
+                        'provincias': lista_provincias,
+                        'provincia_usuario': provincia.pk
+                    }
+                else:
+                    response_data = {
+                        'result': 'ok',
+                        'message': "listado provincias",
+                        'provincias': lista_provincias
+                    }
                 return http.HttpResponse(json.dumps(response_data), content_type="application/json")
             else:
                 response_data = {

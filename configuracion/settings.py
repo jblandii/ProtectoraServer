@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'web',
     'protectora',
     'comunidad',
+    'conversacion',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -190,8 +191,6 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'protectora.jmgl@gmail.com'
 EMAIL_HOST_PASSWORD = 'JaMaGeLe'
 EMAIL_PORT = 587
-
-
 
 ROOT_URLCONF = 'configuracion.urls'
 

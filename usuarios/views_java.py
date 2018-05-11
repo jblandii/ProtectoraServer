@@ -228,9 +228,9 @@ def cambiar_pass(request):
                 userdjango.save()
                 token = get_object_or_None(Tokenregister, user=userdjango)
                 token.delete()
-                response_data = {'result': 'ok', 'message': 'Password cambiado'}
+                response_data = {'result': 'ok', 'message': 'Contraseña cambiada'}
             else:
-                response_data = {'result': 'error', 'message': 'Password antiguo incorrecto'}
+                response_data = {'result': 'error', 'message': 'Contraseña antigua incorrecta'}
         else:
             response_data = {'result': 'error', 'message': 'Usuario no logueado'}
 
@@ -238,6 +238,42 @@ def cambiar_pass(request):
 
     except Exception as e:
         response_data = {'errorcode': 'U0005', 'result': 'error', 'message': 'Error en perfil de usuario: ' + str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+# metodo para que un usuario pueda ver su perfil, necesario estar loegueado y pasar su id y token
+@csrf_exempt
+def cambiar_email(request):
+    print "cambiando pass"
+    try:
+        datos = json.loads(request.POST['data'])
+        emailantiguo = datos.get('antiguo')
+        emailnuevo = datos.get('nuevo')
+
+        if comprobar_usuario(datos):
+            userdjango = get_userdjango_by_token(datos)
+            usuarios_email = User.objects.filter(email=emailnuevo)
+            print userdjango.email
+            print emailantiguo
+            if userdjango.email == emailantiguo:
+                if usuarios_email.count() == 0:
+                    userdjango.email = emailnuevo
+                    userdjango.save()
+                    token = get_object_or_None(Tokenregister, user=userdjango)
+                    token.delete()
+                    response_data = {'result': 'ok', 'message': 'Email cambiado'}
+                else:
+                    response_data = {'result': 'error', 'message': 'Ese email ya está registrado'}
+            else:
+                response_data = {'result': 'error', 'message': 'Email antiguo incorrecto'}
+        else:
+            response_data = {'result': 'error', 'message': 'Usuario no logueado'}
+
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0005', 'result': 'error',
+                         'message': 'Error en perfil de usuario: ' + str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
@@ -301,15 +337,19 @@ def registrar_usuario(request):
 
 @csrf_exempt
 def cambiar_datos(request):
-    print "cambiando pass"
+    print "cambiando datos personales"
     try:
         datos = json.loads(request.POST['data'])
         if comprobar_usuario(datos):
             userdjango = get_userdjango_by_token(datos)
             userdjango.first_name = datos.get('nombre')
             userdjango.last_name = datos.get('apellidos')
-            userdjango.email = datos.get('email')
+            userdjango.datosextrauser.direccion = datos.get('direccion')
+            userdjango.datosextrauser.provincia = datos.get('provincia')
+            userdjango.datosextrauser.telefono = datos.get('telefono')
+            userdjango.datosextrauser.cod_postal = datos.get('cod_postal')
             userdjango.save()
+            userdjango.datosextrauser.save()
             response_data = {'result': 'ok', 'message': 'Datos cambiados'}
         else:
             response_data = {'result': 'error', 'message': 'Usuario no logueado'}
@@ -333,14 +373,17 @@ def cargar_usuario(request):
             userdjango = get_object_or_None(User, pk=usuario_id)
 
             if userdjango is not None:
-                usuario = []
-                usuario.append({
+
+                usuario = {
                     "username": userdjango.username,
                     "nombre": userdjango.first_name,
                     "apellidos": userdjango.last_name,
                     "email": userdjango.email,
-                    "telefono": userdjango.datosextrauser.telefono
-                })
+                    "telefono": userdjango.datosextrauser.telefono,
+                    "direccion": userdjango.datosextrauser.direccion,
+                    "codigo_postal": userdjango.datosextrauser.cod_postal,
+                    "provincia": userdjango.datosextrauser.provincia.provincia
+                }
                 response_data = {
                     'result': 'ok',
                     'message': 'datos del usuario',

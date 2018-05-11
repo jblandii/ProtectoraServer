@@ -22,91 +22,102 @@ def cargar_animales(request):
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
             animales = Animal.objects.all()
-            # try:
-            #     mascota = datos.get('mascota')
-            #     # Filtro por perro o gato
-            #     animales = animales.filter(mascota=mascota)
-            # except:
-            #     pass
-            #
-            # try:
-            #     provincia = datos.get('provincia')
-            #
-            #     # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
-            #     objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
-            #
-            #     animales = animales.filter(provincia=objeto_provincia)
-            # except:
-            #     pass
-            #
-            # try:
-            #     raza = datos.get('raza')
-            #     animales = animales.filter(raza=raza)
-            # except:
-            #     pass
-            #
-            # try:
-            #     color = datos.get('color')
-            #     animales = animales.filter(color=color)
-            # except:
-            #     pass
-            #
-            # try:
-            #     try:
-            #         edad = datos.get('edad_menos')
-            #         edad = animales.filter(edad__lte=edad)
-            #     except:
-            #         pass
-            #
-            #     try:
-            #         edad = datos.get('edad_mas')
-            #         edad = animales.filter(edad__gte=edad)
-            #     except:
-            #         pass
-            # except:
-            #     pass
-            #
-            # try:
-            #     tipo_pelaje = datos.get('pelaje')
-            #     tipo_pelaje = animales.filter(tipo_pelaje=tipo_pelaje)
-            # except:
-            #     pass
-            #
-            # try:
-            #     sexo = datos.get('sexo')
-            #     sexo = animales.filter(sexo=sexo)
-            # except:
-            #     pass
-            #
-            # try:
-            #     estado = datos.get('estado')
-            #     estado = animales.filter(estado=estado)
-            # except:
-            #     pass
-            #
-            # try:
-            #     tamano = datos.get('tamano')
-            #     tamano = animales.filter(tamano=tamano)
-            # except:
-            #     pass
-            #
-            # try:
-            #     vacuna = datos.get('vacuna')
-            #     vacuna = animales.filter(vacuna=vacuna)
-            # except:
-            #     pass
-            #
-            # try:
-            #     chip = datos.get('chip')
-            #     chip = animales.filter(chip=chip)
-            # except:
-            #     pass
-            #
-            # try:
-            #     protectora = datos.get('protectora')
-            #     protectora = animales.filter(protectora=protectora)
-            # except:
-            #     pass
+            try:
+                mascota = datos.get('mascota')
+                if mascota:
+                    animales = animales.filter(mascota=mascota)
+            except:
+                pass
+
+            try:
+                provincia = datos.get('provincia')
+                if provincia:
+                    # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
+                    objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
+
+                animales = animales.filter(provincia=objeto_provincia)
+            except:
+                pass
+
+            try:
+                raza = datos.get('raza')
+                if raza:
+                    animales = animales.filter(raza=raza)
+            except:
+                pass
+
+            try:
+                color = datos.get('color')
+                if color:
+                    animales = animales.filter(color=color)
+            except:
+                pass
+
+            try:
+                try:
+                    edadmenos = datos.get('edad_menos')
+                    if edadmenos:
+                        edad = animales.filter(edad__lte=edadmenos)
+                except:
+                    pass
+
+                try:
+                    edadmas = datos.get('edad_mas')
+                    if edadmas:
+                        edad = animales.filter(edad__gte=edadmas)
+                except:
+                    pass
+            except:
+                pass
+
+            try:
+                tipo_pelaje = datos.get('pelaje')
+                if tipo_pelaje:
+                    tipo_pelaje = animales.filter(tipo_pelaje=tipo_pelaje)
+            except:
+                pass
+
+            try:
+                sexo = datos.get('sexo')
+                if sexo:
+                    sexo = animales.filter(sexo=sexo)
+            except:
+                pass
+
+            try:
+                estado = datos.get('estado')
+                if estado:
+                    estado = animales.filter(estado=estado)
+            except:
+                pass
+
+            try:
+                tamano = datos.get('tamano')
+                if tamano:
+                    tamano = animales.filter(tamano=tamano)
+            except:
+                pass
+
+            try:
+                vacuna = datos.get('vacuna')
+                if vacuna:
+                    vacuna = animales.filter(vacuna=vacuna)
+            except:
+                pass
+
+            try:
+                chip = datos.get('chip')
+                if chip:
+                    chip = animales.filter(chip=chip)
+            except:
+                pass
+
+            try:
+                protectora = datos.get('protectora')
+                if protectora:
+                    protectora = animales.filter(protectora=protectora)
+            except:
+                pass
 
             lista_animales = []
             for animal in animales:
