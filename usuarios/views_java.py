@@ -345,9 +345,10 @@ def cambiar_datos(request):
             userdjango.first_name = datos.get('nombre')
             userdjango.last_name = datos.get('apellidos')
             userdjango.datosextrauser.direccion = datos.get('direccion')
-            userdjango.datosextrauser.provincia = datos.get('provincia')
+            provincia = get_object_or_None(Provincia, provincia=datos.get('provincia'))
+            userdjango.datosextrauser.provincia = provincia
             userdjango.datosextrauser.telefono = datos.get('telefono')
-            userdjango.datosextrauser.cod_postal = datos.get('cod_postal')
+            userdjango.datosextrauser.cod_postal = datos.get('codigo_postal')
             userdjango.save()
             userdjango.datosextrauser.save()
             response_data = {'result': 'ok', 'message': 'Datos cambiados'}
