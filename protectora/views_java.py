@@ -295,3 +295,50 @@ def cargar_animales_me_gusta(request):
     except Exception as e:
         response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def dar_mg(request):
+    print "dar/quitar mg"
+    try:
+        datos = json.loads(request.POST['data'])
+
+        try:
+            usuario_id = datos.get('usuario_id')
+            token = datos.get('token')
+            animal_id = datos.get('animal')
+            megusta = datos.get('me_gusta')
+            print usuario_id
+            print token
+            if comprobar_usuario(datos):
+                usuario = get_object_or_None(User, pk=usuario_id)
+                animal = get_object_or_None(Animal, pk=animal_id)
+                if animal is not None:
+                    if megusta == "true":
+                        mg = MeGusta.objects.filter(usuario=usuario)
+                        if mg is not None:
+                            mg = mg.filter(animal=animal)
+                            if mg is not None:
+                                mg.delete()
+                                response_data = {'result': 'ok',
+                                                 'message': 'Se ha quitado mg correctamente'}
+
+                    else:
+                        mg = MeGusta.objects.create(animal=animal, usuario=usuario)
+                        mg.save()
+                        response_data = {'result': 'ok',
+                                         'message': 'Se ha dado mg correctamente'}
+                else:
+                    response_data = {'result': 'ok',
+                                     'message': 'no hay animal'}
+            else:
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+
+        print response_data
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
