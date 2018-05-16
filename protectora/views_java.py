@@ -1,6 +1,9 @@
 # -*- encoding: utf-8 -*-
+from django.contrib.auth.models import User
+
 from comunidad.models import Provincia
-from protectora.models import Animal, Protectora
+from protectora.models import Animal, Protectora, MeGusta
+from usuarios.views_java import comprobar_usuario
 
 __author__ = 'brian'
 
@@ -22,6 +25,7 @@ def cargar_animales(request):
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
             animales = Animal.objects.all()
+            usuario = get_object_or_None(User, pk=usuario_id)
             try:
                 mascota = datos.get('mascota')
                 if mascota:
@@ -123,7 +127,16 @@ def cargar_animales(request):
             for animal in animales:
                 fotos = []
                 for foto in animal.imagenanimal_set.all():
-                    fotos.append({"foto": str(foto.imagen)})
+                    # fotos.append({"foto": str(foto.imagen)})
+                    fotos.append(str(foto.imagen))
+
+                meGusta = False
+
+                animales = MeGusta.objects.filter(animal=animal)
+                if animales.count() > 0:
+                    animales = animales.filter(usuario=usuario)
+                    if animales.count() > 0:
+                        meGusta = True
 
                 lista_animales.append({"pk": animal.pk,
                                        "nombre": animal.nombre,
@@ -139,16 +152,17 @@ def cargar_animales(request):
                                        "vacuna": animal.vacuna,
                                        "chip": animal.chip,
                                        "estado": animal.estado,
-                                       "id_protectora": animal.protectora.pk})
-                # "imagenes": fotos})
+                                       "id_protectora": animal.protectora.pk,
+                                       "foto": fotos[0],
+                                       "me_gusta": meGusta})
 
-            if len(lista_animales) == 0:
-                response_data = {'result': 'ok_sin_animales',
-                                 'message': 'no hay animales con dichos filtros'}
-            else:
-                response_data = {'result': 'ok',
-                                 'message': 'listado de animales',
-                                 "lista_animales": lista_animales}
+                if len(lista_animales) == 0:
+                    response_data = {'result': 'ok_sin_animales',
+                                     'message': 'no hay animales con dichos filtros'}
+                else:
+                    response_data = {'result': 'ok',
+                                     'message': 'listado de animales',
+                                     "lista_animales": lista_animales}
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
@@ -208,6 +222,74 @@ def cargar_protectoras(request):
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def cargar_animales_me_gusta(request):
+    print "carga de animales que gustan"
+    try:
+        datos = json.loads(request.POST['data'])
+
+        try:
+            token = datos.get('token')
+            usuario_id = datos.get('usuario_id')
+            if comprobar_usuario(datos):
+                usuario = get_object_or_None(User, pk=usuario_id)
+                animales = MeGusta.objects.filter(usuario=usuario)
+                lista_animales = []
+                lista_mg = []
+                for mg in animales:
+                    lista_mg.append(mg.animal)
+
+                for animal in lista_mg:
+                    fotos = []
+                    for foto in animal.imagenanimal_set.all():
+                        fotos.append(str(foto.imagen))
+
+                    meGusta = False
+
+                    animales = MeGusta.objects.filter(animal=animal)
+                    if animales.count() > 0:
+                        animales = animales.filter(usuario=usuario)
+                        if animales.count() > 0:
+                            meGusta = True
+
+                    lista_animales.append({"pk": animal.pk,
+                                           "nombre": animal.nombre,
+                                           "raza": animal.raza.nombre,
+                                           "mascota": animal.mascota,
+                                           "color": animal.color,
+                                           "edad": animal.edad,
+                                           "pelaje": animal.tipo_pelaje,
+                                           "sexo": animal.sexo,
+                                           "tamano": animal.tamano,
+                                           "peso": animal.peso,
+                                           "enfermedad": animal.enfermedad,
+                                           "vacuna": animal.vacuna,
+                                           "chip": animal.chip,
+                                           "estado": animal.estado,
+                                           "id_protectora": animal.protectora.pk,
+                                           "foto": fotos[0],
+                                           "me_gusta": meGusta})
+
+                    if len(lista_animales) == 0:
+                        response_data = {'result': 'ok_sin_animales',
+                                         'message': 'no hay animales con dichos filtros'}
+                    else:
+                        response_data = {'result': 'ok',
+                                         'message': 'listado de animales',
+                                         "lista_animales": lista_animales}
+            else:
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+
+        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     except Exception as e:

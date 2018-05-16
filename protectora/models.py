@@ -79,7 +79,7 @@ class MeGusta(models.Model):
     usuario = models.ForeignKey(User)
 
     def __unicode__(self):
-        return self.usuario
+        return self.usuario.username
 
 
 class Adopcion(models.Model):

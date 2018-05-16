@@ -39,7 +39,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'dal',
     'dal_select2',
-    'suit',  # If you deploy your project with Apache or Debug=False dont forget to run ./manage.py collectstatic
+    'material',
+    'material.admin',
+    # 'suit',  # If you deploy your project with Apache or Debug=False dont forget to run ./manage.py collectstatic
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

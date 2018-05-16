@@ -371,25 +371,30 @@ def cargar_usuario(request):
         try:
             token = datos.get('token')
             usuario_id = datos.get('usuario_id')
-            userdjango = get_object_or_None(User, pk=usuario_id)
+            if comprobar_usuario(datos):
+                userdjango = get_object_or_None(User, pk=usuario_id)
 
-            if userdjango is not None:
+                if userdjango is not None:
 
-                usuario = {
-                    "username": userdjango.username,
-                    "nombre": userdjango.first_name,
-                    "apellidos": userdjango.last_name,
-                    "email": userdjango.email,
-                    "telefono": userdjango.datosextrauser.telefono,
-                    "direccion": userdjango.datosextrauser.direccion,
-                    "codigo_postal": userdjango.datosextrauser.cod_postal,
-                    "provincia": userdjango.datosextrauser.provincia.provincia
-                }
-                response_data = {
-                    'result': 'ok',
-                    'message': 'datos del usuario',
-                    'usuario': usuario
-                }
+                    usuario = {
+                        "username": userdjango.username,
+                        "nombre": userdjango.first_name,
+                        "apellidos": userdjango.last_name,
+                        "email": userdjango.email,
+                        "telefono": userdjango.datosextrauser.telefono,
+                        "direccion": userdjango.datosextrauser.direccion,
+                        "codigo_postal": userdjango.datosextrauser.cod_postal,
+                        "provincia": userdjango.datosextrauser.provincia.provincia,
+                        "foto": str(userdjango.datosextrauser.imagen)
+                    }
+                    response_data = {
+                        'result': 'ok',
+                        'message': 'datos del usuario',
+                        'usuario': usuario
+                    }
+                else:
+                    response_data = {'result': 'error',
+                                     'message': 'ha habido un error, intentelo de nuevo'}
             else:
                 response_data = {'result': 'error',
                                  'message': 'ha habido un error, intentelo de nuevo'}
@@ -425,6 +430,58 @@ def get_usuarios(request):
     except Exception as e:
         response_data = {'errorcode': 'U0006', 'result': 'error',
                          'message': 'Error en busqueda de usuarios : ' + str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def set_foto(request):
+    print "eligiendo foto"
+    # import pdb
+    # pdb.set_trace()
+    try:
+        try:
+            datos = json.loads(request.POST['data'])
+            token = datos.get('token')
+
+        except Exception as e:
+            token = request.POST['token']
+
+        if comprobar_usuario(datos):
+            user = get_userdjango_by_token(datos)
+            archivo = request.FILES['file']
+            tama = archivo.size
+            # print "-----------------------------------------------------"
+            # print ("TAMAÑO",tama)
+            if tama <= 2000000:
+                extension = archivo.name.split('.')[-1]
+                lista = ['jpg', 'JPG', 'png', 'PNG']
+                if extension in lista:
+                    nombre = 'usuario' + str(user.pk) + '.' + extension
+                    lpath = settings.MEDIA_IMAGE + "perfiles/" + nombre
+                    destino = open(lpath, 'wb+')
+                    for chunk in archivo.chunks():
+                        destino.write(chunk)
+                    destino.close()
+
+                    user.datosextrauser.imagen = "/imagenes/perfiles/" + nombre
+                    user.datosextrauser.save()
+                response_data = {'result': 'ok',
+                                 'message': 'Foto subida correctamente'}
+            else:
+                response_data = {'result': 'error',
+                                 'message': 'Foto demasiado pesada'}
+
+        else:
+            response_data = {'result': 'error', 'message': 'Sesiones no cargadas'}
+
+        print response_data
+
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        print e
+        response_data = {'errorcode': 'U0006', 'result': 'error',
+                         'message': 'Error en busqueda de sesiones : ' + str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 # realizar este get_usuarios en Centros y Sesiones. Lo unico que varia es el try con los datos que cada uno pide

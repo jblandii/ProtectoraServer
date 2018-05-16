@@ -21,3 +21,5 @@ sqlparse
 static
 wsgiref==0.1.2
 youtube-dl
+
+django-material==1.1.1
