@@ -358,7 +358,8 @@ def cargar_imagenes_animal(request):
                 animal_id = datos.get('animal')
                 try:
                     animal_detalle = get_object_or_None(Animal, pk=animal_id)
-                    print animal_detalle
+                    protectora_id = animal_detalle.protectora
+                    objeto_protectora = get_object_or_None(Protectora, pk=protectora_id.pk)
                 except:
                     response_data = {'result': 'error', 'message': 'Animal no encontrado'}
                     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -367,9 +368,17 @@ def cargar_imagenes_animal(request):
                 for foto in animal_detalle.imagenanimal_set.all():
                     fotos.append(str(foto.imagen))
 
+                protectora = {
+                    "pk": objeto_protectora.pk,
+                    "nombre": objeto_protectora.nombre,
+                    "provincia": objeto_protectora.provincia.provincia,
+                    "direccion": objeto_protectora.direccion,
+                    "codigo_postal": objeto_protectora.cod_postal
+                }
                 response_data = {'result': 'ok',
                                  'message': 'listado de animales',
-                                 "foto": fotos}
+                                 "foto": fotos,
+                                 "protectora": protectora}
             else:
                 response_data = {'result': 'error', 'message': 'error de token o usuario'}
         except:
