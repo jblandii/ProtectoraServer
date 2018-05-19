@@ -22,7 +22,6 @@ def cargar_animales(request):
         datos = json.loads(request.POST['data'])
 
         try:
-            token = datos.get('token')
             usuario_id = datos.get('usuario_id')
             animales = Animal.objects.all()
             usuario = get_object_or_None(User, pk=usuario_id)
@@ -147,9 +146,11 @@ def cargar_animales(request):
                                        "pelaje": animal.tipo_pelaje,
                                        "sexo": animal.sexo,
                                        "tamano": animal.tamano,
+                                       "fecha": str(animal.fecha),
                                        "peso": animal.peso,
                                        "enfermedad": animal.enfermedad,
                                        "vacuna": animal.vacuna,
+                                       "descripcion": animal.descripcion,
                                        "chip": animal.chip,
                                        "estado": animal.estado,
                                        "id_protectora": animal.protectora.pk,
@@ -198,26 +199,27 @@ def cargar_protectoras(request):
         datos = json.loads(request.POST['data'])
 
         try:
-            token = datos.get('token')
-            usuario_id = datos.get('usuario_id')
-            protectoras = Protectora.objects.all()
+            if comprobar_usuario(datos):
+                protectoras = Protectora.objects.all()
 
-            lista_protectoras = []
-            for protectora in protectoras:
-                lista_protectoras.append({
-                    "pk": protectora.pk,
-                    "nombre": protectora.nombre,
-                    "direccion": protectora.direccion,
-                    "codigo_postal": protectora.cod_postal,
-                    "provincia": protectora.provincia.provincia})
+                lista_protectoras = []
+                for protectora in protectoras:
+                    lista_protectoras.append({
+                        "pk": protectora.pk,
+                        "nombre": protectora.nombre,
+                        "direccion": protectora.direccion,
+                        "codigo_postal": protectora.cod_postal,
+                        "provincia": protectora.provincia.provincia})
 
-            if len(lista_protectoras) == 0:
-                response_data = {'result': 'ok_sin_protectoras',
-                                 'message': 'no hay animales con dichos filtros'}
+                if len(lista_protectoras) == 0:
+                    response_data = {'result': 'ok_sin_protectoras',
+                                     'message': 'no hay animales con dichos filtros'}
+                else:
+                    response_data = {'result': 'ok',
+                                     'message': 'listado de protectoras',
+                                     "lista_protectoras": lista_protectoras}
             else:
-                response_data = {'result': 'ok',
-                                 'message': 'listado de protectoras',
-                                 "lista_protectoras": lista_protectoras}
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
             print response_data
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
@@ -272,6 +274,8 @@ def cargar_animales_me_gusta(request):
                                            "enfermedad": animal.enfermedad,
                                            "vacuna": animal.vacuna,
                                            "chip": animal.chip,
+                                           "descripcion": animal.descripcion,
+                                           # "fecha": animal.fecha,
                                            "estado": animal.estado,
                                            "id_protectora": animal.protectora.pk,
                                            "foto": fotos[0],
@@ -336,6 +340,40 @@ def dar_mg(request):
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
+        print response_data
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def cargar_imagenes_animal(request):
+    print "carga de imagenes animal"
+    try:
+        datos = json.loads(request.POST['data'])
+        try:
+            if comprobar_usuario(datos):
+                animal_id = datos.get('animal')
+                try:
+                    animal_detalle = get_object_or_None(Animal, pk=animal_id)
+                    print animal_detalle
+                except:
+                    response_data = {'result': 'error', 'message': 'Animal no encontrado'}
+                    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+                fotos = []
+                for foto in animal_detalle.imagenanimal_set.all():
+                    fotos.append(str(foto.imagen))
+
+                response_data = {'result': 'ok',
+                                 'message': 'listado de animales',
+                                 "foto": fotos}
+            else:
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
         print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 

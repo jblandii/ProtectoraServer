@@ -41,6 +41,7 @@ class Animal(models.Model):
                 ('Gato', 'Gato'))
     nombre = models.CharField(max_length=15)
     mascota = models.CharField(max_length=10, choices=ANIMALES)
+    descripcion = models.CharField(max_length=500, blank=True, null=True)
     raza = models.ForeignKey(RazaAnimal)
     COLORES = (('Blanco', 'Blanco'),
                ('Negro', 'Negro'),
