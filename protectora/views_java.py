@@ -2,7 +2,7 @@
 from django.contrib.auth.models import User
 
 from comunidad.models import Provincia
-from protectora.models import Animal, Protectora, MeGusta
+from protectora.models import Animal, Protectora, MeGusta, RedSocial
 from usuarios.views_java import comprobar_usuario
 
 __author__ = 'brian'
@@ -408,9 +408,20 @@ def cargar_imagenes_protectora(request):
                 fotos = []
                 for foto in protectora_detalle.imagenprotectora_set.all():
                     fotos.append(str(foto.imagen))
+
+                redes = []
+                for red in protectora_detalle.redsocial_set.all():
+                    redes.append({
+                        'pk': red.pk,
+                        'red': red.tipo,
+                        'valor': red.valor
+                    })
+
+                print redes
                 response_data = {'result': 'ok',
                                  'message': 'listado de imagenes de protectora',
-                                 "foto": fotos}
+                                 "foto": fotos,
+                                 "redes": redes}
             else:
                 response_data = {'result': 'error', 'message': 'error de token o usuario'}
         except:
@@ -421,3 +432,5 @@ def cargar_imagenes_protectora(request):
     except Exception as e:
         response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+

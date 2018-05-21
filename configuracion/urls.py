@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^usuarios/', include('usuarios.urls')),
     url(r'^comunidad/', include('comunidad.urls_java')),
     url(r'^protectora/', include('protectora.urls_java')),
+    url(r'^conversacion/', include('conversacion.urls_java')),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
