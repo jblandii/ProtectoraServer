@@ -7,11 +7,9 @@ from usuarios.views_java import comprobar_usuario
 
 __author__ = 'brian'
 
-import django.contrib.auth as auth
 import django.http as http
 from annoying.functions import get_object_or_None
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 import json
 
 
@@ -209,11 +207,12 @@ def cargar_protectoras(request):
                         "nombre": protectora.nombre,
                         "direccion": protectora.direccion,
                         "codigo_postal": protectora.cod_postal,
-                        "provincia": protectora.provincia.provincia})
+                        "provincia": protectora.provincia.provincia,
+                        "descripcion": protectora.descripcion})
 
                 if len(lista_protectoras) == 0:
                     response_data = {'result': 'ok_sin_protectoras',
-                                     'message': 'no hay animales con dichos filtros'}
+                                     'message': 'no hay protectoras con dichos filtros'}
                 else:
                     response_data = {'result': 'ok',
                                      'message': 'listado de protectoras',
@@ -373,12 +372,45 @@ def cargar_imagenes_animal(request):
                     "nombre": objeto_protectora.nombre,
                     "provincia": objeto_protectora.provincia.provincia,
                     "direccion": objeto_protectora.direccion,
-                    "codigo_postal": objeto_protectora.cod_postal
+                    "codigo_postal": objeto_protectora.cod_postal,
+                    "descripcion": objeto_protectora.descripcion
                 }
                 response_data = {'result': 'ok',
                                  'message': 'listado de animales',
                                  "foto": fotos,
                                  "protectora": protectora}
+            else:
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        print response_data
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def cargar_imagenes_protectora(request):
+    print "carga de imagenes protectora"
+    try:
+        datos = json.loads(request.POST['data'])
+        try:
+            if comprobar_usuario(datos):
+                protectora_id = datos.get('protectora')
+                try:
+                    protectora_detalle = get_object_or_None(Protectora, pk=protectora_id)
+                except:
+                    response_data = {'result': 'error', 'message': 'Protectora no encontrado'}
+                    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+                fotos = []
+                for foto in protectora_detalle.imagenprotectora_set.all():
+                    fotos.append(str(foto.imagen))
+                response_data = {'result': 'ok',
+                                 'message': 'listado de imagenes de protectora',
+                                 "foto": fotos}
             else:
                 response_data = {'result': 'error', 'message': 'error de token o usuario'}
         except:

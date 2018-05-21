@@ -12,6 +12,7 @@ class Protectora(models.Model):
     direccion = models.CharField(max_length=50)
     provincia = models.ForeignKey(Provincia)
     cod_postal = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=500, blank=True, null=True)
 
     def __unicode__(self):
         return self.nombre
@@ -33,7 +34,7 @@ class RedSocial(models.Model):
     valor = models.CharField(max_length=512)
 
     def __unicode__(self):
-        return self.tipo
+        return self.protectora.nombre
 
 
 class Animal(models.Model):
@@ -97,4 +98,12 @@ class ImagenAnimal(models.Model):
     imagen = models.ImageField(upload_to="imagenes/animales")
 
     def __unicode__(self):
-        return str(self.animal.pk)
+        return str(self.animal.nombre)
+
+
+class ImagenProtectora(models.Model):
+    protectora = models.ForeignKey(Protectora)
+    imagen = models.ImageField(upload_to="imagenes/protectora")
+
+    def __unicode__(self):
+        return self.protectora.nombre

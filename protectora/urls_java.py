@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^cargar_animales_me_gusta/$', protectora_java_views.cargar_animales_me_gusta),
     url(r'^dar_mg/$', protectora_java_views.dar_mg),
     url(r'^cargar_imagenes_animal/$', protectora_java_views.cargar_imagenes_animal),
+    url(r'^cargar_imagenes_protectora/$', protectora_java_views.cargar_imagenes_protectora),
 ]
