@@ -31,8 +31,20 @@ def enviar_mensaje_protectora(request):
 
                 usuario_objeto2 = get_object_or_None(User, pk=admin_protectora)
 
-                conversacion = Conversacion.objects.create(protectora=usuario_objeto2, usuario=usuario_objeto)
-                conversacion.save()
+                conversacion = get_object_or_None(Conversacion, protectora=usuario_objeto2, usuario=usuario_objeto)
+                print conversacion
+
+                if conversacion is None:
+                    conversacion = Conversacion.objects.create(protectora=usuario_objeto2,
+                                                               usuario=usuario_objeto)
+                    conversacion.save()
+                    print conversacion
+                else:
+                    conversacion = get_object_or_None(Conversacion,
+                                                      protectora=usuario_objeto2,
+                                                      usuario=usuario_objeto)
+                    print conversacion
+
                 mensaje = Mensaje.objects.create(usuario=usuario_objeto, mensaje=mensaje, conversacion=conversacion)
                 mensaje.save()
 
@@ -60,7 +72,7 @@ def cargar_conversaciones(request):
             if comprobar_usuario(datos):
                 usuario_id = datos.get("usuario_id")
                 usuario = get_object_or_None(User, pk=usuario_id)
-                conversaciones = Conversacion.objects.filter(usuario=usuario)
+                conversaciones = Conversacion.objects.filter(usuario=usuario).order_by('-pk')
 
                 lista_conversaciones = []
                 for conversacion in conversaciones:
@@ -159,6 +171,96 @@ def cargar_mensajes(request):
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    except Exception as e:
+        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+@csrf_exempt
+def enviar_mensaje_protectora_de_usuario(request):
+    print "enviando mensaje a la protectora y devuelvo mensaje"
+    try:
+        datos = json.loads(request.POST['data'])
+        try:
+            if comprobar_usuario(datos):
+                protectora_id = datos.get('protectora')
+                usuario_id = datos.get('usuario_id')
+                mensaje = datos.get('message')
+                print mensaje
+                try:
+                    protectora_objeto = get_object_or_None(Protectora, pk=protectora_id)
+                    usuario_objeto = get_object_or_None(User, pk=usuario_id)
+                except:
+                    response_data = {'result': 'error', 'message': 'Protectora o Usuario no encontrados'}
+                    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+                admin_protectora = protectora_objeto.admin.pk
+
+                usuario_objeto2 = get_object_or_None(User, pk=admin_protectora)
+
+                conversacion = Conversacion.objects.filter(usuario=usuario_objeto)
+                if conversacion is not None:
+                    conversacion = conversacion.filter(protectora=usuario_objeto2)
+                    if conversacion is not None:
+                        conversacion = get_object_or_None(Conversacion,
+                                                          protectora=usuario_objeto2,
+                                                          usuario=usuario_objeto)
+                    else:
+                        conversacion = Conversacion.objects.create(protectora=usuario_objeto2,
+                                                                   usuario=usuario_objeto)
+                        conversacion.save()
+                else:
+                    conversacion = Conversacion.objects.create(protectora=usuario_objeto2,
+                                                               usuario=usuario_objeto)
+                    conversacion.save()
+
+                mensaje = Mensaje.objects.create(usuario=usuario_objeto,
+                                                 mensaje=mensaje,
+                                                 conversacion=conversacion)
+                mensaje.save()
+
+                if mensaje.usuario.username == usuario_objeto.username:
+                    emisario = "usuario"
+                else:
+                    emisario = "protectora"
+
+                lista_conversaciones = []
+                lista_conversaciones.append({
+                    'pk': mensaje.pk,
+                    'usuario': {
+                        'username': usuario_objeto.username,
+                        'nombre': usuario_objeto.first_name,
+                        'apellidos': usuario_objeto.last_name,
+                        'email': usuario_objeto.email,
+                        'telefono': usuario_objeto.datosextrauser.telefono,
+                        'direccion': usuario_objeto.datosextrauser.direccion,
+                        'codigo_postal': usuario_objeto.datosextrauser.cod_postal,
+                        'provincia': usuario_objeto.datosextrauser.provincia.provincia,
+                        'foto': str(usuario_objeto.datosextrauser.imagen)
+                    },
+                    'protectora': {
+                        'pk': protectora_objeto.pk,
+                        'nombre': protectora_objeto.nombre,
+                        'direccion': protectora_objeto.direccion,
+                        'codigo_postal': protectora_objeto.cod_postal,
+                        'provincia': protectora_objeto.provincia.provincia,
+                        'descripcion': protectora_objeto.descripcion
+                    },
+                    'mensaje': mensaje.mensaje,
+                    'emisario': emisario,
+                    'hora': str(mensaje.hora)
+                })
+
+                response_data = {'result': 'ok',
+                                 'message': 'mensaje enviado',
+                                 'lista_conversaciones': lista_conversaciones}
+            else:
+                response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        except:
+            response_data = {'result': 'error', 'message': 'error de token o usuario'}
+        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     except Exception as e:

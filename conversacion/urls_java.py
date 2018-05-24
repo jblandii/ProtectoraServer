@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^enviar_mensaje_protectora/$', conversacion_java_views.enviar_mensaje_protectora),
     url(r'^cargar_conversaciones/$', conversacion_java_views.cargar_conversaciones),
     url(r'^cargar_mensajes/$', conversacion_java_views.cargar_mensajes),
+    url(r'^enviar_mensaje_protectora_de_usuario/$', conversacion_java_views.enviar_mensaje_protectora_de_usuario),
 ]
