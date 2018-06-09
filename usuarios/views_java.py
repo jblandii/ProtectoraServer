@@ -318,8 +318,6 @@ def registrar_usuario(request):
                 user.set_password(password)
                 usuario = DatosExtraUser.objects.create(user=user, direccion="", provincia=provincia_escogida,
                                                         cod_postal="", telefono="")
-                # usuario = DatosExtraUser.objects.create(user=user.pk, provincia=provincia_escogida)
-                # user.datosextrauser.getProvincia(provincia_escogida)
                 user.save()
                 usuario.save()
                 enviarmail.enviar_email("Registro", "Se ha registrado con éxito en Mímame",
