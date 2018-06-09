@@ -322,6 +322,9 @@ def registrar_usuario(request):
                 # user.datosextrauser.getProvincia(provincia_escogida)
                 user.save()
                 usuario.save()
+                enviarmail.enviar_email("Registro", "Se ha registrado con éxito en Mímame",
+                                        "Se ha registrado con éxito en Mímame",
+                                        [user.email, ])
                 response_data = {'result': 'ok', 'message': 'Usuario creado correctamente'}
             else:
                 response_data = {'result': 'error', 'message': 'Este email ya existe'}

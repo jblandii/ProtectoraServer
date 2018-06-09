@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.contrib.auth.models import User
 
-from comunidad.models import Provincia
+from comunidad.models import Provincia, ComunidadAutonoma
 from protectora.models import Animal, Protectora, MeGusta, RedSocial
 from usuarios.views_java import comprobar_usuario
 
@@ -18,6 +18,7 @@ def cargar_animales(request):
     print "carga de animales"
     try:
         datos = json.loads(request.POST['data'])
+        print datos
 
         try:
             usuario_id = datos.get('usuario_id')
@@ -33,17 +34,8 @@ def cargar_animales(request):
             try:
                 provincia = datos.get('provincia')
                 if provincia:
-                    # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
                     objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
-
-                animales = animales.filter(provincia=objeto_provincia)
-            except:
-                pass
-
-            try:
-                raza = datos.get('raza')
-                if raza:
-                    animales = animales.filter(raza=raza)
+                    animales = animales.filter(protectora__provincia=objeto_provincia)
             except:
                 pass
 
@@ -55,134 +47,86 @@ def cargar_animales(request):
                 pass
 
             try:
-                try:
-                    edadmenos = datos.get('edad_menos')
-                    if edadmenos:
-                        edad = animales.filter(edad__lte=edadmenos)
-                except:
-                    pass
-
-                try:
-                    edadmas = datos.get('edad_mas')
-                    if edadmas:
-                        edad = animales.filter(edad__gte=edadmas)
-                except:
-                    pass
-            except:
-                pass
-
-            try:
                 tipo_pelaje = datos.get('pelaje')
                 if tipo_pelaje:
-                    tipo_pelaje = animales.filter(tipo_pelaje=tipo_pelaje)
+                    animales = animales.filter(tipo_pelaje=tipo_pelaje)
             except:
                 pass
 
             try:
                 sexo = datos.get('sexo')
                 if sexo:
-                    sexo = animales.filter(sexo=sexo)
+                    animales = animales.filter(sexo=sexo)
             except:
                 pass
 
             try:
                 estado = datos.get('estado')
                 if estado:
-                    estado = animales.filter(estado=estado)
+                    animales = animales.filter(estado=estado)
             except:
                 pass
 
             try:
                 tamano = datos.get('tamano')
                 if tamano:
-                    tamano = animales.filter(tamano=tamano)
-            except:
-                pass
-
-            try:
-                vacuna = datos.get('vacuna')
-                if vacuna:
-                    vacuna = animales.filter(vacuna=vacuna)
+                    animales = animales.filter(tamano=tamano)
             except:
                 pass
 
             try:
                 chip = datos.get('chip')
                 if chip:
-                    chip = animales.filter(chip=chip)
+                    animales = animales.filter(chip=chip)
             except:
                 pass
 
-            try:
-                protectora = datos.get('protectora')
-                if protectora:
-                    protectora = animales.filter(protectora=protectora)
-            except:
-                pass
+            if len(animales) == 0:
+                response_data = {'result': 'ok_sin_animales',
+                                 'message': 'no hay animales con dichos filtros'}
+            else:
 
-            lista_animales = []
-            for animal in animales:
-                fotos = []
-                for foto in animal.imagenanimal_set.all():
-                    # fotos.append({"foto": str(foto.imagen)})
-                    fotos.append(str(foto.imagen))
+                lista_animales = []
+                for animal in animales:
+                    fotos = []
+                    for foto in animal.imagenanimal_set.all():
+                        # fotos.append({"foto": str(foto.imagen)})
+                        fotos.append(str(foto.imagen))
 
-                meGusta = False
+                    meGusta = False
 
-                animales = MeGusta.objects.filter(animal=animal)
-                if animales.count() > 0:
-                    animales = animales.filter(usuario=usuario)
+                    animales = MeGusta.objects.filter(animal=animal)
                     if animales.count() > 0:
-                        meGusta = True
+                        animales = animales.filter(usuario=usuario)
+                        if animales.count() > 0:
+                            meGusta = True
 
-                lista_animales.append({"pk": animal.pk,
-                                       "nombre": animal.nombre,
-                                       "raza": animal.raza.nombre,
-                                       "mascota": animal.mascota,
-                                       "color": animal.color,
-                                       "edad": animal.edad,
-                                       "pelaje": animal.tipo_pelaje,
-                                       "sexo": animal.sexo,
-                                       "tamano": animal.tamano,
-                                       "fecha": str(animal.fecha),
-                                       "peso": animal.peso,
-                                       "enfermedad": animal.enfermedad,
-                                       "vacuna": animal.vacuna,
-                                       "descripcion": animal.descripcion,
-                                       "chip": animal.chip,
-                                       "estado": animal.estado,
-                                       "id_protectora": animal.protectora.pk,
-                                       "foto": fotos[0],
-                                       "me_gusta": meGusta})
+                    lista_animales.append({"pk": animal.pk,
+                                           "nombre": animal.nombre,
+                                           "raza": animal.raza.nombre,
+                                           "mascota": animal.mascota,
+                                           "color": animal.color,
+                                           "edad": animal.edad,
+                                           "pelaje": animal.tipo_pelaje,
+                                           "sexo": animal.sexo,
+                                           "tamano": animal.tamano,
+                                           "fecha": str(animal.fecha),
+                                           "peso": animal.peso,
+                                           "enfermedad": animal.enfermedad,
+                                           "vacuna": animal.vacuna,
+                                           "descripcion": animal.descripcion,
+                                           "chip": animal.chip,
+                                           "estado": animal.estado,
+                                           "id_protectora": animal.protectora.pk,
+                                           "foto": fotos[0],
+                                           "me_gusta": meGusta})
 
-                if len(lista_animales) == 0:
-                    response_data = {'result': 'ok_sin_animales',
-                                     'message': 'no hay animales con dichos filtros'}
-                else:
                     response_data = {'result': 'ok',
                                      'message': 'listado de animales',
                                      "lista_animales": lista_animales}
         except:
             response_data = {'result': 'error', 'message': 'error de token o usuario'}
 
-        # if token is not None:
-        #
-        #     # Obtengo el objeto provincia filtrando por la provincia en la que vive el usuario.
-        #     objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
-        #
-        #     animales = Animal.objects.filter(protectora__provincia=objeto_provincia)
-        #
-        #     print animales.count()
-        #
-        #     lista_animales = []
-        #
-        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
-        # else:
-        #     response_data = {'result': 'ok', 'message': 'usuario existente'}
-
-        # user = get_object_or_None(Tokenregister, token=token)
-        # usu = user.user.datosextrauser.provincia
-        print response_data
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     except Exception as e:
@@ -199,6 +143,23 @@ def cargar_protectoras(request):
         try:
             if comprobar_usuario(datos):
                 protectoras = Protectora.objects.all()
+
+                try:
+                    comunidad = datos.get('comunidad_autonoma')
+                    if comunidad:
+                        objeto_comunidad = get_object_or_None(ComunidadAutonoma, comunidad_autonoma=comunidad)
+                        protectoras = protectoras.filter(provincia__comunidad_autonoma=objeto_comunidad)
+                        print protectoras
+                except:
+                    pass
+
+                try:
+                    provincia = datos.get('provincia')
+                    if provincia:
+                        objeto_provincia = get_object_or_None(Provincia, provincia=provincia)
+                        protectoras = protectoras.filter(provincia=objeto_provincia)
+                except:
+                    pass
 
                 lista_protectoras = []
                 for protectora in protectoras:
@@ -432,5 +393,3 @@ def cargar_imagenes_protectora(request):
     except Exception as e:
         response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-
-
