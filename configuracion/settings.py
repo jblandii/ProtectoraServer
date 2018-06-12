@@ -186,7 +186,7 @@ CKEDITOR_CONFIGS = {
 }
 
 # CONFIGURACIÓN DE CORREO
-DEFAULT_FROM_EMAIL = 'Protectora <info@dreamsappscreative.es>'
+DEFAULT_FROM_EMAIL = 'info@dreamsappscreative.es'
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'SSL.OVH.NET'
