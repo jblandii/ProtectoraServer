@@ -1,16 +1,16 @@
 #!/bin/bash
-NOMBRE_ENTORNO=universitariosApuros
+NOMBRE_ENTORNO=Protectora
 # finalizar con la barra siempre que sea directorios
 RUTA_ENTORNO=/var/www/entornos/
-DIRECTORIO_PROYECTO=/var/www/universitariosApuros/
+DIRECTORIO_PROYECTO=/var/www/Protectora/
 ARCHIVO_WSGI=${DIRECTORIO_PROYECTO}configuracion/apache.wsgi
 
 
 # creacion del archivo de configuracion de apache
 ARCHIVO_CONF_APACHE=/etc/apache2/sites-available/${NOMBRE_ENTORNO}.conf
 
-SERVER_NAME=universitarios.dreamsappscreative.es
-SERVER_ALIAS=universitarios.dreamsappscreative.es
+SERVER_NAME=jblandii.dreamsappscreative.es
+SERVER_ALIAS=jblandii.dreamsappscreative.es
 ARCHIVO_LOG=/root/${NOMBRE_ENTORNO}.log
 
 
