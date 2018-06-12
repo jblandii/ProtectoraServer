@@ -186,12 +186,12 @@ CKEDITOR_CONFIGS = {
 }
 
 # CONFIGURACIÓN DE CORREO
-DEFAULT_FROM_EMAIL = 'protectora.jmgl@gmail.com'
+DEFAULT_FROM_EMAIL = 'Protectora <info@dreamsappscreative.es>'
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'protectora.jmgl@gmail.com'
-EMAIL_HOST_PASSWORD = 'JaMaGeLe'
+EMAIL_HOST = 'SSL.OVH.NET'
+EMAIL_HOST_USER = 'info@dreamsappscreative.es'
+EMAIL_HOST_PASSWORD = 'DREAMS500HP'
 EMAIL_PORT = 587
 
 ROOT_URLCONF = 'configuracion.urls'
