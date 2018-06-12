@@ -1,8 +1,8 @@
 #!/bin/bash
-NOMBRE_ENTORNO=Protectora
+NOMBRE_ENTORNO=ProtectoraServer
 # finalizar con la barra siempre que sea directorios
 RUTA_ENTORNO=/var/www/entornos/
-DIRECTORIO_PROYECTO=/var/www/Protectora/
+DIRECTORIO_PROYECTO=/var/www/ProtectoraServer/
 ARCHIVO_WSGI=${DIRECTORIO_PROYECTO}configuracion/apache.wsgi
 
 
